@@ -1,3 +1,337 @@
+## New Feature: Power Operation
+
+This final project extends Module 14 by adding a **Power** calculation operation.
+
+### Power Operation
+- **Description:** Calculates base raised to exponent (base^exponent)
+- **Example:** 2^3 = 8
+- **Usage:** Requires exactly 2 inputs: [base, exponent]
+- **Implementation:** Uses Python's `**` operator
+
+### Testing
+- All 92 tests passing
+- Comprehensive test coverage for power operation
+- CI/CD pipeline validates every commit
+
+# Final Project - IS601 Calculator API
+
+A full-stack FastAPI calculator application with user authentication, JWT tokens, and comprehensive BREAD operations for calculations.
+
+## 🎯 Project Overview
+
+This project extends Module 14 by adding a **Power operation** to the calculator, along with complete testing coverage and CI/CD deployment.
+
+### Features
+- ✅ User registration and authentication (JWT tokens)
+- ✅ Five calculation operations: Addition, Subtraction, Multiplication, Division, **Power**
+- ✅ Full BREAD operations (Browse, Read, Edit, Add, Delete)
+- ✅ RESTful API with FastAPI
+- ✅ Comprehensive test suite (92 tests passing)
+- ✅ CI/CD pipeline with GitHub Actions
+- ✅ Docker containerization and deployment
+
+---
+
+## 🚀 New Feature: Power Operation
+
+### Description
+The Power operation calculates base raised to exponent (base^exponent).
+
+### Example
+- Input: `[2, 3]`
+- Result: `8` (2³ = 8)
+
+### Usage
+```json
+POST /calculations
+{
+  "type": "power",
+  "inputs": [2, 3]
+}
+```
+
+### Implementation Details
+- Requires exactly 2 inputs: `[base, exponent]`
+- Uses Python's `**` operator
+- Returns `ValueError` for invalid inputs
+- Fully tested with unit, integration, and E2E tests
+
+---
+
+## 🐳 Docker Hub Repository
+
+**Image:** [jav0613/final_project_is601](https://hub.docker.com/r/jav0613/final_project_is601)
+
+**Pull the latest image:**
+```bash
+docker pull jav0613/final_project_is601:latest
+```
+
+---
+
+## 💻 Running the Application
+
+### Option 1: Using Docker (Recommended)
+
+#### Pull and run from Docker Hub:
+```bash
+docker pull jav0613/final_project_is601:latest
+docker run -p 8000:8000 jav0613/final_project_is601:latest
+```
+
+#### Or build and run locally:
+```bash
+docker build -t final_project_is601 .
+docker run -p 8000:8000 final_project_is601
+```
+
+#### Using Docker Compose:
+```bash
+docker-compose up
+```
+
+**Access the application:**
+- **Web UI:** http://localhost:8000
+- **API Documentation:** http://localhost:8000/docs
+- **Health Check:** http://localhost:8000/health
+
+---
+
+### Option 2: Running Locally (Without Docker)
+
+#### Prerequisites:
+- Python 3.10+
+- pip
+- Virtual environment (recommended)
+
+#### Steps:
+
+1. **Clone the repository:**
+```bash
+git clone https://github.com/jorgeavergara522/final_project_is601.git
+cd final_project_is601
+```
+
+2. **Create and activate virtual environment:**
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+3. **Install dependencies:**
+```bash
+pip install -r requirements.txt
+playwright install --with-deps chromium  # For E2E tests
+```
+
+4. **Run the application:**
+```bash
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+5. **Access the application:**
+- Web UI: http://localhost:8000
+- API Docs: http://localhost:8000/docs
+
+---
+
+## 🧪 Running Tests Locally
+
+### Run All Tests:
+```bash
+TESTING=true pytest -v
+```
+
+### Run Specific Test Suites:
+
+**Unit Tests:**
+```bash
+TESTING=true pytest tests/unit/ -v
+```
+
+**Integration Tests:**
+```bash
+TESTING=true pytest tests/integration/ -v
+```
+
+**E2E Tests:**
+```bash
+E2E_TESTS=true pytest tests/e2e/ -v
+```
+
+### Run Tests with Coverage:
+```bash
+TESTING=true pytest --cov=app --cov-report=html
+# Open htmlcov/index.html in your browser
+```
+
+### Test Summary:
+- **Total Tests:** 92 passing, 2 skipped
+- **Unit Tests:** All passing
+- **Integration Tests:** All passing
+- **E2E Tests:** All passing
+- **Coverage:** 95%+
+
+---
+
+## 📁 Project Structure
+```
+final_project_is601/
+├── app/
+│   ├── auth/
+│   │   ├── dependencies.py    # Auth dependencies
+│   │   ├── hashing.py         # Password hashing
+│   │   └── jwt.py             # JWT token management
+│   ├── models/
+│   │   ├── calculation.py     # Calculation model (includes Power)
+│   │   └── user.py            # User model
+│   ├── operations/
+│   │   └── __init__.py        # Calculator operations
+│   ├── schemas/
+│   │   ├── calculation.py     # Calculation schemas
+│   │   ├── token.py           # Token schemas
+│   │   └── user.py            # User schemas
+│   ├── database.py            # Database configuration
+│   └── main.py                # FastAPI application
+├── tests/
+│   ├── unit/                  # Unit tests
+│   ├── integration/           # Integration tests
+│   └── e2e/                   # End-to-end tests
+├── templates/                 # HTML templates
+├── static/                    # Static files (CSS, JS)
+├── .github/workflows/         # CI/CD pipeline
+├── Dockerfile
+├── docker-compose.yml
+├── requirements.txt
+└── README.md
+```
+
+---
+
+## 🔐 Environment Variables
+
+Create a `.env` file in the root directory:
+```env
+# Database
+DATABASE_URL=postgresql://postgres:postgres@db:5432/fastapi_db
+
+# JWT Settings
+JWT_SECRET_KEY=your-secret-key-here
+JWT_REFRESH_SECRET_KEY=your-refresh-secret-key-here
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=15
+REFRESH_TOKEN_EXPIRE_DAYS=7
+
+# Testing
+TESTING=false
+```
+
+---
+
+## 🚦 CI/CD Pipeline
+
+### GitHub Actions Workflow
+
+The project includes a complete CI/CD pipeline that:
+
+1. ✅ **Runs all tests** (unit, integration, E2E)
+2. ✅ **Scans for security vulnerabilities** (Trivy)
+3. ✅ **Builds Docker image**
+4. ✅ **Deploys to Docker Hub** (on main branch)
+
+**View the latest build:**
+https://github.com/jorgeavergara522/final_project_is601/actions
+
+---
+
+## 📊 API Endpoints
+
+### Authentication
+- `POST /auth/register` - Register new user
+- `POST /auth/login` - Login (JSON)
+- `POST /auth/token` - Login (OAuth2 form)
+
+### Calculations
+- `POST /calculations` - Create calculation
+- `GET /calculations` - List user's calculations
+- `GET /calculations/{id}` - Get specific calculation
+- `PUT /calculations/{id}` - Update calculation
+- `DELETE /calculations/{id}` - Delete calculation
+
+### Health
+- `GET /health` - Health check
+
+---
+
+## 🧮 Calculation Types
+
+| Operation        | Type             | Example              | Result |
+|-----------------|------------------|----------------------|--------|
+| Addition        | `addition`       | `[1, 2, 3]`          | `6`    |
+| Subtraction     | `subtraction`    | `[10, 3, 2]`         | `5`    |
+| Multiplication  | `multiplication` | `[2, 3, 4]`          | `24`   |
+| Division        | `division`       | `[100, 2, 5]`        | `10`   |
+| **Power** ✨    | `power`          | `[2, 3]`             | `8`    |
+
+---
+
+## 👨‍💻 Author
+
+**Jorge Avergara**
+- GitHub: [@jorgeavergara522](https://github.com/jorgeavergara522)
+- Docker Hub: [jav0613](https://hub.docker.com/u/jav0613)
+- Course: IS601 - Python for Web API Development (Fall 2025)
+
+---
+
+## 📝 Reflection
+
+### What I Learned
+
+This final project reinforced key concepts in full-stack web development:
+
+1. **FastAPI Framework:** Building RESTful APIs with automatic documentation
+2. **SQLAlchemy ORM:** Database modeling with polymorphic inheritance
+3. **JWT Authentication:** Secure token-based authentication with refresh tokens
+4. **Testing:** Writing comprehensive unit, integration, and E2E tests
+5. **Docker:** Containerization and multi-platform deployment
+6. **CI/CD:** Automating testing, security scanning, and deployment with GitHub Actions
+
+### Challenges Overcome
+
+- **Circular Import Issues:** Resolved by restructuring JWT authentication module
+- **Test Isolation:** Fixed Faker unique conflicts by using UUID-based generation
+- **Database Management:** Properly handling SQLite for tests vs PostgreSQL for production
+- **E2E Testing:** Configuring lifespan to reset database only for E2E runs
+
+### Power Operation Implementation
+
+Adding the Power operation required:
+- Creating `Power` subclass in `calculation.py`
+- Adding `POWER` enum to calculation schemas
+- Implementing `power()` function in operations
+- Writing comprehensive tests at all levels
+- Updating UI templates and API documentation
+
+The polymorphic factory pattern made this straightforward and maintainable.
+
+---
+
+## 📄 License
+
+This project is for educational purposes as part of the IS601 course at NJIT.
+
+---
+
+## 🙏 Acknowledgments
+
+- Professor Keith Williams for course guidance
+- NJIT IS601 Fall 2025 course materials
+- FastAPI and SQLAlchemy documentation
+
+
+
+
 # 📦 Project Setup
 
 ---
