@@ -2,45 +2,26 @@
 from datetime import datetime, timedelta, timezone
 from typing import Any, Optional, Union
 from jose import jwt, JWTError
-from passlib.context import CryptContext
-from fastapi import HTTPException, status, Depends
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import HTTPException, status
 from uuid import UUID
 import secrets
 
 from app.core.config import get_settings
-from app.auth.redis import add_to_blacklist, is_blacklisted
 from app.schemas.token import TokenType
-from app.database import get_db
-from sqlalchemy.orm import Session
-from app.models.user import User
 
 settings = get_settings()
 
-# Password hashing
-pwd_context = CryptContext(
-    schemes=["bcrypt"],
-    deprecated="auto",
-    bcrypt__rounds=settings.BCRYPT_ROUNDS
-)
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
-
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Verify a plain password against its hash."""
-    return pwd_context.verify(plain_password, hashed_password)
-
-def get_password_hash(password: str) -> str:
-    """Hash a password using bcrypt."""
-    return pwd_context.hash(password)
-
 def create_token(
-    user_id: Union[str, UUID],
+    user_id_or_data: Union[str, UUID, int, dict],
     token_type: TokenType,
+    username: Optional[str] = None,
     expires_delta: Optional[timedelta] = None
 ) -> str:
     """
     Create a JWT token (access or refresh).
+    Accepts either:
+    - user_id + username as separate args (new style)
+    - dict with 'sub' key (old style for backward compatibility)
     """
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
@@ -54,11 +35,24 @@ def create_token(
                 days=settings.REFRESH_TOKEN_EXPIRE_DAYS
             )
 
-    if isinstance(user_id, UUID):
+    # Handle both old style (dict) and new style (primitives)
+    if isinstance(user_id_or_data, dict):
+        # Old style: {"sub": "user_id"}
+        user_id = user_id_or_data.get("sub")
+        username = user_id_or_data.get("username", "unknown")
+    else:
+        # New style: user_id and username as separate args
+        user_id = user_id_or_data
+        if username is None:
+            username = "unknown"
+
+    # Convert UUID or int to string for JWT
+    if isinstance(user_id, (UUID, int)):
         user_id = str(user_id)
 
     to_encode = {
         "sub": user_id,
+        "username": username,
         "type": token_type.value,
         "exp": expire,
         "iat": datetime.now(timezone.utc),
@@ -79,13 +73,14 @@ def create_token(
             detail=f"Could not create token: {str(e)}"
         )
 
-async def decode_token(
+def decode_token(
     token: str,
     token_type: TokenType,
     verify_exp: bool = True
 ) -> dict[str, Any]:
     """
     Decode and verify a JWT token.
+    Returns the decoded payload as a dict.
     """
     try:
         secret = (
@@ -108,13 +103,6 @@ async def decode_token(
                 headers={"WWW-Authenticate": "Bearer"},
             )
             
-        if await is_blacklisted(payload["jti"]):
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Token has been revoked",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
-            
         return payload
         
     except jwt.ExpiredSignatureError:
@@ -127,39 +115,5 @@ async def decode_token(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-async def get_current_user(
-    token: str = Depends(oauth2_scheme),
-    db: Session = Depends(get_db)
-) -> User:
-    """
-    Dependency to get current user from access token.
-    Returns the actual User model instance.
-    """
-    try:
-        payload = await decode_token(token, TokenType.ACCESS)
-        user_id = payload["sub"]
-        
-        user = db.query(User).filter(User.id == user_id).first()
-        if user is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="User not found"
-            )
-            
-        if not user.is_active:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Inactive user"
-            )
-            
-        return user
-        
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=str(e),
             headers={"WWW-Authenticate": "Bearer"},
         )

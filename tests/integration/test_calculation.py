@@ -150,3 +150,33 @@ def test_invalid_inputs_for_division():
     division = Division(user_id=dummy_user_id(), inputs=[10])
     with pytest.raises(ValueError, match="Inputs must be a list with at least two numbers."):
         division.get_result()
+
+#Exponent Power
+
+def test_create_power_calculation(client, auth_token):
+    """Test creating power calculation via API"""
+    response = client.post(
+        "/calculations/",
+        json={
+            "type": "power",
+            "inputs": [2, 3]
+        },
+        headers={"Authorization": f"Bearer {auth_token}"}
+    )
+    print(f"Status: {response.status_code}, Body: {response.json()}")
+    assert response.status_code == 201
+    assert response.json()["result"] == 8
+
+#Negative Test
+
+def test_power_requires_two_inputs(client, auth_token):
+    """Power should fail with the wrong number of inputs"""
+    response = client.post(
+        "/calculations/",
+        json={
+            "type": "power",
+            "inputs": [2]   # Missing exponent
+        },
+        headers={"Authorization": f"Bearer {auth_token}"}
+    )
+    assert response.status_code in (400, 422)

@@ -8,8 +8,8 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/fastapi_db"
     
     # JWT Settings
-    JWT_SECRET_KEY: str = "your-super-secret-key-change-this-in-production"
-    JWT_REFRESH_SECRET_KEY: str = "your-refresh-secret-key-change-this-in-production"
+    JWT_SECRET_KEY: str = "TEST_SECRET_KEY"
+    JWT_REFRESH_SECRET_KEY: str = "TEST_REFRESH_SECRET_KEY"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7

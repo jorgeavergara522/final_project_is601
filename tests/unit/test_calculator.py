@@ -3,6 +3,7 @@
 import pytest  # Import the pytest framework for writing and running tests
 from typing import Union  # Import Union for type hinting multiple possible types
 from app.operations import add, subtract, multiply, divide  # Import the calculator functions from the operations module
+from app.operations import operations
 
 # Define a type alias for numbers that can be either int or float
 Number = Union[int, float]
@@ -232,3 +233,21 @@ def test_divide_by_zero() -> None:
     # Assert that the exception message contains the expected error message
     assert "Cannot divide by zero!" in str(excinfo.value), \
         f"Expected error message 'Cannot divide by zero!', but got '{excinfo.value}'"
+
+
+def test_power_basic():
+    """Test basic power operation"""
+    result = operations.power(2, 3)
+    assert result == 8
+
+def test_power_decimals():
+    """Test power with decimals"""
+    result = operations.power(2.5, 2)
+    assert result == 6.25
+
+def test_power_zero_exponent():
+    """Test x^0 equals 1"""
+    result = operations.power(5, 0)
+    assert result == 1
+
+
